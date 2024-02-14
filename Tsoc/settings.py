@@ -58,23 +58,23 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.tangosixoclock.in',
 ]
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'deltatsoc',
-        'USER': 'postgres',
-        'PASSWORD': 'Django123',
-        'HOST': 'window-db.cpzckj1ocmci.ap-south-1.rds.amazonaws.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'deltatsoc',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Django123',
+#         'HOST': 'window-db.cpzckj1ocmci.ap-south-1.rds.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -133,7 +133,7 @@ EMAIL_TIMEOUT = 10
 
 AWS_ACCESS_KEY_ID = 'AKIA3J2PI5IBCMJAUV7L'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'tangosixoclocklinux'
+AWS_STORAGE_BUCKET_NAME = 'tangowindows'
 AWS_S3_SIGNATURE_NAME = 's3v4'
 AWS_S3_REGION_NAME = 'ap-south-1'
 AWS_S3_FILE_OVERWRITE = False
