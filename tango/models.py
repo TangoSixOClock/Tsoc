@@ -51,7 +51,9 @@ class Video(models.Model):
     thumbnail = models.ImageField(upload_to='files/thumbnail/',null=True)
     title =  models.CharField(max_length=100,null=True)
     serial_number = models.IntegerField(null=True)
-    video_id = models.FileField(upload_to='files/videos/',null=True)
+    video_id = models.CharField(max_length=250,null=True)
+    slug = models.CharField(max_length=40,null=True,unique=True)
+    
 
     def __str__(self):
         return self.title

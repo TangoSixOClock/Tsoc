@@ -184,11 +184,11 @@ class RegistrationForm(forms.Form):
 
         # Check if the institute contains only alphabetic characters
         if not profession.replace(' ', '').isalpha():
-            raise forms.ValidationError('Institute must contain only alphabetic characters.')
+            raise forms.ValidationError('Desgination must contain only alphabetic characters.')
 
         # Check if the length of the institute is not greater than 30 characters
         if len(profession) > 15:
-            raise forms.ValidationError('Institute name must be at most 15 characters long.')
+            raise forms.ValidationError('Desgination name must be at most 15 characters long.')
 
         return profession
     

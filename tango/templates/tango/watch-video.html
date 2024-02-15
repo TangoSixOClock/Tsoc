@@ -84,11 +84,12 @@
 
    <div class="video-container">
       <div class="video">
-         <video src="{{video.video_id.url}}" controls id="video" controlsList="nodownload"  oncontextmenu="return false;"></video>
+         {% comment %} <video src="{{video.video_id}}" controls id="video" controlsList="nodownload" type='video/mp4' oncontextmenu="return false;"></video> {% endcomment %}
+         <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/{{video.video_id}}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Chapter 1 - Security &amp; Security Architecture"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
       </div>
       <h3 class="title">{{video.title}}</h3>
       <div class="info">
-         <p class="date"><i class="fas fa-calendar"></i><span>12-02-2024</span></p>
+         {% comment %} <p class="date"><i class="fas fa-calendar"></i><span>12-02-2024</span></p> {% endcomment %}
          {% comment %} <p class="date"><i class="fas fa-heart"></i><span>44 likes</span></p> {% endcomment %}
       </div>
       {% comment %} <div class="tutor">
@@ -103,10 +104,10 @@
          {% comment %} <button><i class="far fa-heart"></i><span>More</span></button> {% endcomment %}
          <a href="https://freesuggestionbox.com/pub/czmjjbf" class="inline-btn">Share Assignment (Anonymous)</a>
       </form>
-      <p class="description">
+      {% comment %} <p class="description">
          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque labore ratione, hic exercitationem mollitia obcaecati culpa dolor placeat provident porro.
          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid iure autem non fugit sint. A, sequi rerum architecto dolor fugiat illo, iure velit nihil laboriosam cupiditate voluptatum facere cumque nemo!
-      </p>
+      </p> {% endcomment %}
    </div>
 
 </section>

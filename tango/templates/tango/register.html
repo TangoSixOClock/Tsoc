@@ -173,10 +173,10 @@
       </form>
     </div>
 
-    <div class="option">or Connect With Social Media</div>
-        <div class="twitter">
+    <div class="option"></div>
+        {% comment %} <div class="twitter">
           <a href="{% provider_login_url 'google' %}?next=/"><i class="fab fa-google"></i>Sign Up With Google</a>
-        </div>
+        </div> {% endcomment %}
         
         <div class="option">Already have an account ? <a href="{% url 'loginpage' %}">Log In</a></div>
   </div>

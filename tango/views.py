@@ -29,15 +29,41 @@ class CustomPasswordResetView(PasswordResetView):
 
 def home(request):
     courses = Course.objects.all()
-    user = request.user
-    paid = False
-    if not user:
-        quer = UserCourse.objects.filter(user=user).first()
-        if quer is None:
-            paid = False
-        else:
-            paid = True
+    
+    if request.user.is_authenticated:
+        print('yes')
+        try :
+            us = UserProfile.objects.get(user=request.user)
+            print(us)
+        except:
+            print('pass')
+            user = str(request.user)
+            special_chars = ['@', '.', '+', '-', '_',' ']
+            for char in special_chars:
+                user = user.replace(char, '')
+            
+            
+            print('pass1')
+            full_name = str(user)
+            random_letters_first_name = random.sample(full_name[1:], 2)
+            result = full_name[0] + ''.join(random_letters_first_name) 
+            print('yuvi')
+            current_datetime = datetime.now()
+            token_format = "{:02d}{:02d}{:02d}{:02d}{:02d}{:02d}".format(
+                current_datetime.day,
+                current_datetime.month,
+                current_datetime.year % 100,
+                current_datetime.hour,
+                current_datetime.minute,
+                current_datetime.second
+            )
 
+            token = result.upper() + token_format
+            # user_name = nm + result
+            fm = UserProfile(user=request.user,profileid=token)
+            print('f')
+            fm.save()
+    paid = False
     context = {"courses":courses,'paid':paid}
     return render(request,'tango/home.html',context)
 
@@ -115,7 +141,7 @@ def Contact(request):
 def send_notification_to_support(name, email, message):
     subject_owner = 'Support and Help From Tsoc'
     message_owner = f'Name: {name}\nEmail: {email}\nMessage: {message}'
-    send_mail(subject_owner, message_owner, settings.DEFAULT_FROM_EMAIL,[email])
+    send_mail(subject_owner, message_owner, settings.DEFAULT_FROM_EMAIL,[settings.DEFAULT_FROM_EMAIL])
 
 def send_confirmation_payment(name, email,course,amount):
     
@@ -221,7 +247,7 @@ def PaymentPage(request,slug):
             couponcode_message = 'Invalid Coupon Code!'
             print('Code is Invalid!')
 
-    if amount==0:
+    if course.price==0:
         userCourse = UserCourse(user = user , course = course)
         userCourse.save()
         return redirect('home')   
@@ -300,7 +326,20 @@ def LoginPage(request):
 def send_confirmation_register(name, email):
     
     subject = "Welcome to Tango Six O'clock"
-    message = f"Dear {name},\n\nYou are registered in Tango Six O'Clock."
+    message = f'''Dear {name},\n\n
+
+Welcome to TangoSixOclock, your gateway to a world of learning and awareness. We are thrilled to have you on board as a part of our community.
+
+At TangoSixOclock, we are committed to providing a platform for Israeli Counter Crime Education, a crucial aspect of our lives today. This education encompasses a range of strategies and knowledge that are designed to empower individuals to protect themselves, their families, and their communities in an ever-changing world. Understanding and implementing Israeli Counter Crime Education not only enhances personal safety but also fosters a sense of confidence and preparedness in our daily lives.
+
+By joining our website, you are taking the first step towards embracing this valuable education and becoming an advocate for safety and security. We are dedicated to providing you with resources, insights, and a supportive community as you embark on this journey.
+
+We look forward to seeing you thrive within the TangoSixOclock community and making a positive impact in your own life and the lives of those around you.
+
+Once again, welcome to TangoSixOclock!
+
+Best regards,
+The TangoSixOclock Team'''
 
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,[email])
 
@@ -399,7 +438,6 @@ def verifyPayment(request):
 
 @login_required(login_url='/login')
 def News(request):
-    # context = {'data':0}
     return render(request,'tango/news.html')
 
 def TermsCondition(request):
@@ -432,7 +470,7 @@ def watch(request,slug,pk):
     if serial_number is None:
         serial_number = 1 
 
-    video = Video.objects.get(serial_number = serial_number)
+    video = Video.objects.get(serial_number = serial_number,slug=slug)
     if video.serial_number == chapter.number_of_videos:
         quiz_link = True
 
@@ -458,6 +496,8 @@ def watch(request,slug,pk):
 
 @login_required(login_url='/login')
 def adminPage(request):
+    if request.user.is_superuser is False:
+        return redirect('home')
     if request.method == "POST":
         database = request.POST['database']
 
@@ -683,9 +723,10 @@ def send_confirmation_score(name, email,score,chapter):
 
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,[email])
 
+@login_required(login_url='/login')
 def Quiz(request,cor,ch):
     questions = Questions.objects.filter(course__slug=cor, chapter__slug=ch)
-    random_questions = random.sample(list(questions), min(2, questions.count()))
+    random_questions = random.sample(list(questions), min(6, questions.count()))
 
     ques_list = []
 
@@ -693,7 +734,6 @@ def Quiz(request,cor,ch):
         ques_list.append(question)
 
     questions_with_answers = []
-    wrong_ans = []
     total = 0
     marks = 0
 
@@ -709,17 +749,17 @@ def Quiz(request,cor,ch):
                 question = Questions.objects.get(question=key)
                 if question.answer == value:
                     marks += 1
-                else:
-                    wrong_ans.append(key)
+                
         
         score = (marks/total) * 100
-        return redirect('quiz_score',cor=cor,ch=ch,score=int(score),wrong_ans=wrong_ans)
+        return redirect('quiz_score',cor=cor,ch=ch,score=int(score))
 
     context = {'questions_with_answers':questions_with_answers}
     return render(request,'tango/quiz.html',context)
 
-def QuizScore(request,cor,ch,score,wrong_ans):
-    chapter = Chapter.objects.get(slug=cor)
+@login_required(login_url='/login')
+def QuizScore(request,cor,ch,score):
+    chapter = Chapter.objects.get(slug=ch)
     course = Course.objects.get(slug=cor)
     No = int(chapter.serial_number)
     next = False
@@ -743,9 +783,10 @@ def QuizScore(request,cor,ch,score,wrong_ans):
             next = True
             send_confirmation_score(request.user.username,request.user.email,score,chapter)
 
-    context = {'score':score,"next":next,"cor":cor,"ch":ch,'ques':wrong_ans}
+    context = {'score':score,"next":next,"cor":cor,"ch":ch}
     return render(request,'tango/quiz_score.html',context)
 
+@login_required(login_url='/login')
 def CompleteCourse(request):
     if request.method == "POST":
         user = request.user
@@ -756,7 +797,7 @@ def CompleteCourse(request):
 
     return render(request,'tango/complete_course.html')
 
-
+@login_required(login_url='/login')
 def Certificate(request):
     if request.user.is_authenticated:
         user = request.user

@@ -66,5 +66,5 @@ urlpatterns = [
     path('couponuserpage/',views.CouponUserPage,name='couponuserpage'),
 
     path('quiz/<str:cor>/<str:ch>/',views.Quiz,name='quiz'),
-    path('quiz_score/<str:cor>/<str:ch>/<int:score>/<str:wrong_ans>/',views.QuizScore,name='quiz_score'),
+    path('quiz_score/<str:cor>/<str:ch>/<int:score>/',views.QuizScore,name='quiz_score'),
 ]
