@@ -37,6 +37,7 @@ class Chapter(models.Model):
     title =  models.CharField(max_length=100,null=True)
     thumbnail = models.ImageField(upload_to='files/thumbnail/',null=True)
     is_preview = models.BooleanField(default=False)
+    # paid = models.BooleanField(default=False)
     slug = models.CharField(max_length=40,null=True,unique=True)
     serial_number = models.IntegerField(null=True)
     complete_chapter = models.BooleanField(default=False)
@@ -63,7 +64,7 @@ class UserCourse(models.Model):
     course = models.ForeignKey(Course,null=False,on_delete=models.CASCADE)
     course_complete = models.BooleanField(default=False)
     code = models.CharField(max_length=10,blank=True,null=True)
-    complete_date = models.CharField(max_length=15,null=True)
+    complete_date = models.CharField(max_length=15,null=True,blank=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.course.name}'
@@ -144,7 +145,7 @@ class Questions(models.Model):
     course = models.ForeignKey(Course,on_delete=models.CASCADE,null=True)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,null=True)
     question = models.CharField(max_length=250,null=True)
-    answer = models.CharField(max_length=150,null=True)
+    answer = models.CharField(max_length=250,null=True)
 
     def __str__(self):
         return f'{self.question} - {self.chapter.title} - {self.course.name}'
@@ -152,7 +153,7 @@ class Questions(models.Model):
 class Answers(models.Model):
     question = models.ForeignKey(Questions,on_delete=models.CASCADE)
     chapter = models.ForeignKey(Chapter,on_delete=models.CASCADE,null=True)
-    answer = models.CharField(max_length=150,null=True)
+    answer = models.CharField(max_length=250,null=True)
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):

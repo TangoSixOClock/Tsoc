@@ -27,9 +27,12 @@ def is_enrolled(request , course):
     if not request.user.is_authenticated:
         return False
         # i you are enrooled in this course you can watch every video
+    print('yes')
     user = request.user
     try:
+        print(user)
         user_course = UserCourse.objects.get(user = user  , course = course)
+        print(user_course)
         return True
     except:
         return False

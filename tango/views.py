@@ -76,7 +76,10 @@ def Courses(request,slug):
     course = Course.objects.get(slug=slug)
     action = request.GET.get('action')
     error_msg = ''
+    min_ch = 2
+    paid = False
     print(course)
+    print('hel1')
     chapters = Chapter.objects.filter(course=course).order_by("serial_number")
 
     certificate = False
@@ -86,13 +89,16 @@ def Courses(request,slug):
         error_msg = 'Complete previous chapter to unlock.'
     else:
         error_msg = ''
-
+    print('helo2')
     if request.user.is_authenticated is False:
         return redirect("login")
     
-    # complete = UserCourse.objects.get(user=request.user)
-    # if complete.course_complete:
-    #     certificate = True
+    try:
+        complete = UserCourse.objects.get(user=request.user,course=course)
+        min_ch = course.numbers_of_chapter
+    except:
+        pass
+        
 
     context = {
         "course" : course,
@@ -100,6 +106,8 @@ def Courses(request,slug):
         'certificate':certificate,
         'user': user,
         'error_msg':error_msg,
+        "paid":paid,
+        'min_ch':min_ch,
     }
     return render(request,'tango/playlist.html',context)
 
@@ -214,7 +222,7 @@ def PaymentPage(request,slug):
     amount_display = 0
     try:
         user_course = UserCourse.objects.get(user = user  , course = course)
-        error = "You are Already Enrolled in this Course"
+        return redirect('course',slug=slug)
     except:
         pass
 
@@ -461,16 +469,14 @@ def TestimonialPolicy(request):
 def watch(request,slug,pk):
     chapter = Chapter.objects.get(slug=slug)
     quiz_link = False
+    print('heloo')
     ch = chapter.slug
     chapter = Chapter.objects.get(slug=slug,serial_number=pk)
     course = Course.objects.all()
     cor = chapter.course.slug
     serial_number = request.GET.get('lecture')
-    videos = chapter.video_set.all().order_by("serial_number")
-    if serial_number is None:
-        serial_number = 1 
-
-    video = Video.objects.get(serial_number = serial_number,slug=slug)
+    print('helo')
+    video = Video.objects.get(slug=slug)
     if video.serial_number == chapter.number_of_videos:
         quiz_link = True
 
@@ -479,6 +485,7 @@ def watch(request,slug,pk):
     try:
         if chapter.is_preview is False:
             user_course = UserCourse.objects.get(user = user  , course = course)
+
         else:
             print('pass')
     except:
@@ -489,8 +496,7 @@ def watch(request,slug,pk):
         "ch":ch,
         "quiz_link":quiz_link,
         "cor":cor,
-        "video" : video , 
-        'videos':videos,
+        "video" : video, 
     }
     return render(request,'tango/watch-video.html',context)
 
@@ -746,7 +752,7 @@ def Quiz(request,cor,ch):
         print(request.POST)
         for key, value in request.POST.items():
             if not key == 'csrfmiddlewaretoken':
-                question = Questions.objects.get(question=key)
+                question = Questions.objects.get(question=key,chapter__slug=ch)
                 if question.answer == value:
                     marks += 1
                 
@@ -768,6 +774,7 @@ def QuizScore(request,cor,ch,score):
         No += 1
         if No == course.numbers_of_chapter:
             user = UserCourse.objects.get(user=request.user,course=course)
+
             if user.course_complete:
                 return redirect('complete_course')
             
@@ -775,6 +782,7 @@ def QuizScore(request,cor,ch,score):
                 user.course_complete = True
                 user.complete_date = current_date
                 user.save()
+
             return redirect('complete_course')
         else:
             user = UserProfile.objects.get(user=request.user)

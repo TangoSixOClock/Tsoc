@@ -140,7 +140,8 @@
       {% is_enrolled request course as enrolled %}
       {% for v in chapters %}
          {% if v.is_preview or enrolled %}
-            {% if v.serial_number <= user.chapter %}
+            {% if v.serial_number <= min_ch %}
+               {% if v.serial_number <= user.chapter %}
                <a class="box" href="{% url 'watch' v.slug v.serial_number %}">
                   <i class="fas fa-play"></i>
                   <img src="{{v.thumbnail.url}}" alt="Image">
@@ -153,14 +154,23 @@
                      <h3 style="text-decoration:None;">{{v.serial_number}}. {{v.title}} </i></h3>
                   </a>
                {% endif %}
-      {% else %}
+            {% else %}
+               <a class="box" href="{% url 'payment' course.slug %}">
+                  <i class="fas fa-lock" ></i>
+                  <img src="{{v.thumbnail.url}}" alt="Image">
+                  <h3 style="text-decoration:None;">{{v.serial_number}}. {{v.title}} </i></h3>
+               </a>
+                  
+            {% endif %}
+            
+         {% else %}
          <a class="box" href="{% url 'payment' course.slug %}">
             <i class="fas fa-lock" style="color:#edfaf1;"></i>
             <img src="{{v.thumbnail.url}}" alt="Image">
             <h3 style="text-decoration:None;">{{v.serial_number}}. {{v.title}}  </i></h3>
          </a>
          {% endif %}
-      {% endfor %}
+   {% endfor %}
 
    </div>
 
