@@ -65,9 +65,11 @@
 
    <div class="video-container">
       <div class="video">
-         <video src="{{video.video_id}}" controls id="video" controlsList="nodownload" type='video/mp4' oncontextmenu="return false;"></video>
-         
+         {% comment %} <video src="{% url 'video_proxy' video.video_id %}" controls id="video" controlsList="nodownload" type='video/mp4' oncontextmenu="return false;"></video> {% endcomment %}
+         <div style="padding:56.25% 0 0 0;position:relative;">
+         <iframe src="https://player.vimeo.com/video/{{video_id}}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
       </div>
+   </div>
       <h3 class="title">{{video.title}}</h3>
       <div class="info">
         
@@ -82,7 +84,7 @@
 </section>
 
 
-<section class="playlist-videos">
+{% comment %} <section class="playlist-videos">
 
    <h1 class="heading">Videos List</h1>
 
@@ -98,7 +100,7 @@
       {% endfor %}
    </div>
 
-</section>
+</section> {% endcomment %}
 {% if quiz_link %}
 <section class="comments">
 <h1 class="heading">Quiz</h1>
@@ -119,9 +121,27 @@
 
 <!-- custom js file link  -->
 <script src="{% static 'javascript/profile.js' %}"></script>
-<script src="https://www.youtube.com/iframe_api"></script>
+{% comment %} <script src="https://www.youtube.com/iframe_api"></script> {% endcomment %}
+<script src="https://player.vimeo.com/api/player.js"></script>
 
 <script>
+   exports.handler = async (event) => {
+      const request = event.Records[0].cf.request;
+      const headers = request.headers;
+  
+      // Replace 'X-My-Custom-Header' and 'expected-value' with your actual header and value
+      if (!headers['X-ORIGIN-VERIFY-HEADER'] || headers['X-ORIGIN-VERIFY-HEADER'][0].value !== '6006060060sharan') {
+          return {
+              status: '403',
+              statusDescription: 'Forbidden',
+              body: 'Access denied',
+          };
+      }
+  
+      return request;
+  };
+  
+
    var player;
    var video_list
 document.onreadystatechange = function () {

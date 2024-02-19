@@ -67,4 +67,5 @@ urlpatterns = [
 
     path('quiz/<str:cor>/<str:ch>/',views.Quiz,name='quiz'),
     path('quiz_score/<str:cor>/<str:ch>/<int:score>/',views.QuizScore,name='quiz_score'),
+    path('video/<str:url_vid>/', views.video_proxy, name='video_proxy'),
 ]

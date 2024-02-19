@@ -20,6 +20,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.http import HttpResponse
 from django.contrib.auth.views import PasswordResetView
+import requests
+
 import razorpay
 client = razorpay.Client(auth=(KEY_ID, KEY_SECRET))
 
@@ -70,6 +72,29 @@ def home(request):
 def About(request):
     context = {}
     return render(request,'tango/about.html',context)
+
+@login_required(login_url='/login')
+def video_proxy(request,url_vid):
+    try:
+        current_ip = request.session.get('ip',0)
+        user_ip = IpTrack.objects.filter(user = request.user)
+        ips = []
+        for i in user_ip:
+            ips.append(i.ip_address)
+
+        print(ips)
+        if current_ip not in ips:
+            return redirect('loginpage')
+
+    except:
+        pass
+
+    cloudfront_url = f"https://player.vimeo.com/video/{url_vid}?badge=0&autopause=0&player_id=0&app_id=58479"
+    response = requests.get(cloudfront_url)
+    if response.status_code == 200:
+        # response_content = response.iter_content(chunk_size=1024)
+        return HttpResponse(response.content, content_type="text/html")
+    return HttpResponse(status=404)
 
 @login_required(login_url='/login')
 def Courses(request,slug):
@@ -404,13 +429,29 @@ def Register(request):
 def LogoutPage(request):
     logout(request)
     return redirect('home')
+
+def send_confirmation_payment(name, email,course,amount):
     
+    subject = 'TSoC Payment Details'
+    message = f'''Dear {name},\n\nCongratulations on enrolling in {course}, the level 1 program in the Israeli Counter Crime Education series! We are thrilled to welcome you to this comprehensive online course designed to equip you with the essential knowledge and skills for personal security and crime prevention.
+
+Throughout the program, you will delve into a wide range of topics, including risk assessment, self-defense techniques, situational awareness, and much more, all delivered by our team of expert instructors with extensive experience in security and law enforcement.
+
+We are committed to providing you with a valuable learning experience, and we encourage you to actively engage with the course materials, participate in discussions, and take full advantage of the resources available to you.
+
+Thank you for choosing {course} as your pathway to enhancing your personal security awareness and skills. We look forward to supporting you on this educational journey and helping you achieve your goals.
+
+Welcome aboard, and let's embark on this empowering learning adventure together!\n\n\nYou have made a successful payment of Amount : ₹{amount}.'''
+
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,[email])
+
 # @login_required(login_url='/login')
 @csrf_exempt
 def verifyPayment(request):
     
     if request.method == "POST":
         data = request.POST
+        print(data)
         try:
             client.utility.verify_payment_signature(data)
             razorpay_order_id = data['razorpay_order_id']
@@ -419,23 +460,27 @@ def verifyPayment(request):
             pay = client.payment.fetch(razorpay_payment_id)
 
             amount = pay['amount'] / 100  
-
+            print(amount)
             payment = Payment.objects.get(order_id = razorpay_order_id)
             payment.payment_id  = razorpay_payment_id
             payment.status =  True
             
             userCourse = UserCourse(user = payment.user , course = payment.course, code = payment.code)
             userCourse.save()
-            send_confirmation_payment(request.user.userprofile.name,request.user.email,payment.course,amount)
+            print('save')
+            # send_confirmation_payment(request.user.userprofile.name,request.user.email,payment.course,amount)
+            
             payment.user_course = userCourse
             payment.amount = amount
             payment.save()
             coupon = CouponCode.objects.all()
+            print('sent')
             for i in coupon:
                 coun = UserCourse.objects.filter(code=i.code).count()
                 con = CouponCode.objects.get(code=i.code)
                 con.count = coun
                 con.save()
+                print('done')
 
             return redirect('home')
 
@@ -490,6 +535,7 @@ def watch(request,slug,pk):
             print('pass')
     except:
         return redirect('payment',slug='tsoc_delta')
+    
 
     context = {
         "course" : course , 

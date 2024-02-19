@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'bs3$b(+5vqe(=#+5-#p0v6fz9_d)creqg-1ql7exyn18&yx=cu'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*','3.110.177.122','172.31.1.79','https://www.tangosixoclock.in','http://www.tangosixoclock.in']
 
@@ -97,23 +97,23 @@ CORS_ORIGINS_WHITELIST = ["https://www.tangosixoclock.in"]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'delta',
-#         'USER': 'postgres',
-#         'PASSWORD': 'Django123',
-#         'HOST': 'linuxx.cpzckj1ocmci.ap-south-1.rds.amazonaws.com',
-#         'PORT': '5432',
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'delta',
+        'USER': 'postgres',
+        'PASSWORD': 'Django123',
+        'HOST': 'linuxx.cpzckj1ocmci.ap-south-1.rds.amazonaws.com',
+        'PORT': '5432',
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
